@@ -1,0 +1,10 @@
+'use strict';
+
+/**
+ * Created by Administrator on 2016/9/5.
+ */
+require(['scripts/require/lib/a'], function (a) {
+  a.hello2();
+});
+
+//# sourceMappingURL=requirejs_test-compiled.js.map

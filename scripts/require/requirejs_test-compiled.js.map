@@ -1,0 +1,1 @@
+{"version":3,"sources":["requirejs_test.js"],"names":[],"mappings":";;AAAA;;;AAGA,QAAQ,CAAC,uBAAD,CAAR,EAAkC,UAAS,CAAT,EAAW;AACzC,IAAE,MAAF;AACH,CAFD","file":"requirejs_test-compiled.js","sourcesContent":["/**\r\n * Created by Administrator on 2016/9/5.\r\n */\r\nrequire(['scripts/require/lib/a'],function(a){\r\n    a.hello2();\r\n})"]}

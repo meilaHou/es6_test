@@ -39,7 +39,7 @@ var script =
   return output;
 })`;
 
-//return script;
+//return scripts;
 
 function compile(template){
     var evalExpr = /<%=(.+?)%>/g;

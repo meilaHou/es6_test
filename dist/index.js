@@ -64,7 +64,6 @@ function func1() {
 
     return param1;
 }
-
 //测试用
 {
     //alert(testlet);
@@ -82,5 +81,3 @@ function func1() {
         return x * x;
     }));
 }
-
-//# sourceMappingURL=index-compiled.js.map

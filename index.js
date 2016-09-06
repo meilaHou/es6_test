@@ -25,18 +25,38 @@ There are <b>121</b> items
 `);
 
 }
-{
-    //alert(testlet);
 
-/*
-//字符串中嵌入变量
-    var name = "Bob", time = "today";
-    alert(`Hello ${name}, how are you ${time}?`);
-    */
-    console.log((function(){return 1+1;})());
-    foo({x: 1, y: 2}) // 1, 2
+
+function foo({x:a, y = 5}) {
+    console.log(a, y);
+}
+let foo2 = 'outer';
+
+function bar(func = x => foo2) {
+    let foo = 'inner';
+    console.log(func()); // outer
+}
+function throwIfMiss(){
+    throw new Error("参数不能为空");
+}
+function func1(param1 = throwIfMiss()){
+    return param1;
 }
 
-function foo({x, y = 5}) {
-    console.log(x, y);
+
+//测试用
+{
+    //alert(testlet);
+    /*
+     //字符串中嵌入变量
+     var name = "Bob", time = "today";
+     console.log(`Hello ${name}, how are you ${time}?`);
+     */
+    //console.log((function(){return 1+1;})());
+    //foo({x: 1, y: 2}) // 1, 2
+   // console.log(((x)=>x+10)(2));
+    //func1();
+   // bar();
+   console.log([1,2,3].map(x =>x*x)) ;
+
 }
