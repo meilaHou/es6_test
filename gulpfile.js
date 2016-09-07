@@ -4,7 +4,7 @@ var gulp = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
     minifycss = require('gulp-minify-css'),//- 压缩CSS为一行；
     jshint = require('gulp-jshint'),
-    uglify = require('gulp-uglify'),
+    uglify = require('gulp-uglify'),//使用gulp-uglify压缩javascript文件，减小文件大小 丑化代码
     imagemin = require('gulp-imagemin'),
     rename = require('gulp-rename'),//重命名一个文件
     clean = require('gulp-clean'),//清理生成的文件
@@ -14,7 +14,14 @@ var gulp = require('gulp'),
     rev = require('gulp-rev'),//- 对文件名加MD5后缀
     revCollector = require('gulp-rev-collector'), //- 路径替换
 babel = require('gulp-babel'),//使用babel
+//module 打包使用到的工具
     babelify = require('babelify'),
+    gutil = require('gulp-util'),
+    browserify = require("browserify"),
+    sourcemaps = require("gulp-sourcemaps"),
+    source = require('vinyl-source-stream'),
+    buffer = require('vinyl-buffer'),
+
 livereload = require('gulp-livereload');
 
 
@@ -31,11 +38,15 @@ gulp.task('styles', function() {
 });
 
 // 脚本
+/*
+*1.将指定的js脚本合并w为一个js并发布到指定的位置
+*
+* */
 gulp.task('scripts', function() {
-    return gulp.src('scripts/**/*-compiled.js')
+    return gulp.src('scripts/**/*.js')
        // .pipe(jshint('.jshintrc'))
         .pipe(jshint.reporter('default'))
-        .pipe(concat('index.js'))
+        .pipe(concat('all.js'))
         .pipe(gulp.dest('dist/scripts'))
         .pipe(rename({ suffix: '.min' }))
         .pipe(uglify())
@@ -53,17 +64,22 @@ gulp.task('images', function() {
 
 // 清理
 gulp.task('clean', function() {
-    return gulp.src(['dist/styles', 'dist/scripts', 'dist/images'], {read: false})
+    return gulp.src(['dist/styles', 'dist/scripts/**/*', 'dist/images', 'dist/browserify'], {read: false})
         .pipe(clean());
 });
 
-
+/*
+* 转码时,会自动生成转码的文件,并拷贝源文件到指定目录
+* 重命名会重新生成对应的文件
+* */
 gulp.task('babeltask', () => {
-    return gulp.src('index.js')
+    return gulp.src(['index.js','scripts/**/*.js'])
         .pipe(babel({
             presets: ['es2015']
         }))
-        .pipe(gulp.dest('dist'));
+       // .pipe(rename({ suffix: '.compiled' }))
+        .pipe(gulp.dest('dist/scripts/es6_compiled'))
+        //.pipe(notify({ message: 'babeltask task complete' }));
 });
 // 看守
 gulp.task('watch', function() {
@@ -111,21 +127,45 @@ gulp.task('rev', function() {
 
 //gulp.task('default', ['concat', 'rev']);
 
-
-gulp.task('browserify', ['browserify-vendor'], () =>
-    browserify('app/main.js')
-        .external(dependencies)
-        .transform(babelify,{ presets: ["es2015"]}) //注意这里，只有加上presets配置才能正常编译
+/*
+* 1.打包会将关联的文件都打包到一个文件中
+* 2.单独打包,只要没有其他关联,就单独一个
+* */
+gulp.task("browserify", function () {
+    var a =  browserify({
+        entries: "./dist/scripts/es6_compiled/module/module_lib.js",
+        debug: true
+    })
+        .transform(babelify)
+        .on('error',gutil.log)
         .bundle()
+        .on('error',gutil.log)
         .pipe(source('bundle.js'))
+        .pipe(gulp.dest("./dist/browserify"))
+        //.pipe(notify({ message: 'browserify task complete' }));
+    var b = browserify({
+        entries: "./dist/scripts/es6_compiled/module/module_test2.js",
+        debug: true
+    })
+        .transform(babelify)
+        .on('error',gutil.log)
+        .bundle()
+        .on('error',gutil.log)
+        .pipe(source('bundle2.js'))
+        .pipe(gulp.dest("./dist/browserify"))
+        // .pipe(notify({ message: 'browserify task complete' }));
+/*
+
+    return b.bundle()
+        .pipe(source("bundle.js"))
         .pipe(buffer())
-        .pipe(sourcemaps.init({ loadMaps:true }))
-        .pipe(gulpif(production, uglify({ mangle: false })))
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('dist/scripts'))
-);
+        .pipe(sourcemaps.init({loadMaps: true}))
+        .pipe(sourcemaps.write("."))
+        .pipe(gulp.dest("./dist"));
+*/
+});
 
 // 预设任务
-gulp.task('default', ['clean','babeltask'], function() {
-    gulp.start('styles', 'scripts', 'images');
+gulp.task('default', ['babeltask'], function() {
+    gulp.start('styles',  'images','browserify');
 });

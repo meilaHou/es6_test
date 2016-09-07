@@ -1,1 +1,0 @@
-{"version":3,"sources":["Decorator_test.js"],"names":[],"mappings":";;;;;;AAAA;;;IAGM,M;;;;;;;;AACJ;2BACS;AAAE,aAAU,KAAK,KAAf,SAAwB,KAAK,IAA7B;AAAqC","file":"Decorator_test-compiled.js","sourcesContent":["/**\r\n * Created by Administrator on 2016/9/1.\r\n */\r\nclass Person {\r\n  //  @readonly es7 支持\r\n    name() { return `${this.first} ${this.last}` }\r\n}"]}

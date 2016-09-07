@@ -9,7 +9,8 @@ autoprefixer = require('gulp-autoprefixer'),
     //- 压缩CSS为一行；
 jshint = require('gulp-jshint'),
     uglify = require('gulp-uglify'),
-    imagemin = require('gulp-imagemin'),
+    //使用gulp-uglify压缩javascript文件，减小文件大小
+imagemin = require('gulp-imagemin'),
     rename = require('gulp-rename'),
     //重命名一个文件
 clean = require('gulp-clean'),
@@ -24,7 +25,13 @@ revCollector = require('gulp-rev-collector'),
     //- 路径替换
 babel = require('gulp-babel'),
     //使用babel
+//module 打包使用到的工具
 babelify = require('babelify'),
+    gutil = require('gulp-util'),
+    browserify = require("browserify"),
+    sourcemaps = require("gulp-sourcemaps"),
+    source = require('vinyl-source-stream'),
+    buffer = require('vinyl-buffer'),
     livereload = require('gulp-livereload');
 
 // 样式
@@ -35,6 +42,10 @@ gulp.task('styles', function () {
 });
 
 // 脚本
+/*
+*1.将指定的js脚本合并并发布到指定的位置
+*
+* */
 gulp.task('scripts', function () {
     return gulp.src('scripts/**/*-compiled.js')
     // .pipe(jshint('.jshintrc'))
@@ -52,7 +63,7 @@ gulp.task('clean', function () {
 });
 
 gulp.task('babeltask', function () {
-    return gulp.src('index.js').pipe(babel({
+    return gulp.src(['index.js', 'scripts/**/*-compiled.js']).pipe(babel({
         presets: ['es2015']
     })).pipe(gulp.dest('dist'));
 });
@@ -103,14 +114,26 @@ gulp.task('rev', function () {
 //gulp.task('default', ['concat', 'rev']);
 
 
-gulp.task('browserify', ['browserify-vendor'], function () {
-    return browserify('app/main.js').external(dependencies).transform(babelify, { presets: ["es2015"] }) //注意这里，只有加上presets配置才能正常编译
-    .bundle().pipe(source('bundle.js')).pipe(buffer()).pipe(sourcemaps.init({ loadMaps: true })).pipe(gulpif(production, uglify({ mangle: false }))).pipe(sourcemaps.write('.')).pipe(gulp.dest('dist/scripts'));
+gulp.task("browserify", function () {
+    var b = browserify({
+        entries: "./scripts/module/module_test2-compiled.js",
+        debug: true
+    }).transform(babelify).on('error', gutil.log).bundle().on('error', gutil.log).pipe(source('bundle.js')).pipe(gulp.dest("./dist"));
+
+    /*
+    
+        return b.bundle()
+            .pipe(source("bundle.js"))
+            .pipe(buffer())
+            .pipe(sourcemaps.init({loadMaps: true}))
+            .pipe(sourcemaps.write("."))
+            .pipe(gulp.dest("./dist"));
+    */
 });
 
 // 预设任务
 gulp.task('default', ['clean', 'babeltask'], function () {
-    gulp.start('styles', 'scripts', 'images');
+    gulp.start('styles', 'scripts', 'images', 'browserify');
 });
 
 //# sourceMappingURL=gulpfile-compiled.js.map

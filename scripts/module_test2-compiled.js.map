@@ -1,1 +1,0 @@
-{"version":3,"sources":["module_test2.js"],"names":[],"mappings":";;AAAA;;;AAGA;AACA;AACG;AACF","file":"module_test2-compiled.js","sourcesContent":["/**\r\n * Created by Administrator on 2016/9/3.\r\n */\r\n//import {module_foo} from './module_test';\r\n{ \r\n   // console.log(module_foo.module_foo);\r\n}"]}
