@@ -2,7 +2,8 @@
  * Created by Administrator on 2016/9/3.
  */
 //import 'core-js/shim';
-export var module_foo = 'module_lib:默认方法执行输出';
+export const module_foo = 'module_lib:默认方法执行输出';
+//module_foo = "ddf";
 // 报错
 function moudletest() {}
 //export moudletest
